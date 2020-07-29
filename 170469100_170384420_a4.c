@@ -31,6 +31,8 @@ void print_maximum();
 void print_allocation();
 void print_need();
 
+int get_safeSeq();
+
 
 int main(int argc, char** argv) {
 
@@ -310,4 +312,48 @@ int resource_request(int process_num, int request[]){
         need[process_num][i] = need[process_num][i] - request[i];
     }
     return 0;
+}
+
+int get_safeSeq(){
+    // get safe sequence
+    int tempRes[m_resources];
+    for(int i=0; i<m_resources; i++) {
+        tempRes[i] = available[i];
+    }
+    int finished[n_processes];
+    for(int i=0; i<n_processes; i++) finished[i] = FALSE;
+    int process_finished=0;
+
+    // looping while all processes are in the finished array / All processes are visited
+    while(process_finished < n_processes) {
+        int safe = FALSE;
+        for(int i=0; i<n_processes; i++) {
+            if(!finished[i]) {
+                int possible = TRUE;
+                for(int j=0; j<m_resources; j++)
+                {
+                    if(need[i][j] > tempRes[j])
+                    {
+                        possible = FALSE;
+                        break;
+                    }
+                }
+                if(possible) 
+                {
+                    for(int j=0; j<m_resources; j++){
+                        tempRes[j] += allocation[i][j];
+                    }
+                    safeSeq[process_finished] = i;
+                    finished[i] = TRUE;
+                    ++process_finished;
+                    safe = TRUE;
+                }
+            }
+        }
+        if(!safe){
+            return -1; // No Safe Sequence found
+        }
+        
+    }
+    return 0; // safe sequence found}
 }
