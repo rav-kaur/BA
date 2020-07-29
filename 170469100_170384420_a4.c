@@ -98,6 +98,8 @@ int main(int argc, char** argv) {
     }
 
 	printf("Maximum resources from file: \n");
+	print_maximum();
+	
 	// Function for all possible user commands:
     // Exit == end program
     user_commands();
