@@ -22,6 +22,12 @@ int m_resources = 0;
 //Functions
 void get_resource_process_value(FILE* file); // Function to get the number of processes and resources from the test file
 void read_file(FILE* file);
+void print_available();
+void print_maximum();
+void print_allocation();
+void print_need();
+int resource_request(int process_num, int request[]);
+int resource_release(int process_num,int release[]);
 
 
 int main(int argc, char** argv) {
@@ -200,4 +206,40 @@ int resource_release(int process_num,int release[])
 
         }
     }
+}
+
+
+int resource_request(int process_num, int request[]){
+    
+    int safe_state = TRUE;
+    int wait_state = FALSE;
+
+    for (int x=0;x<m_resources;x++)
+    {
+        if (request[x]>need[process_num][x])
+        {            
+            safe_state=FALSE; // you can't request/allocate resources more than its needed and hence it enters unsafe sequence
+            return -1;
+        }   
+        else continue;
+    }
+    for (int x=0;x<m_resources;x++)
+    {
+        if (request[x]>available[x])
+        {
+            wait_state = TRUE;
+            break;
+        }
+        else continue;
+
+    }
+    if (wait_state==TRUE){
+        return -1;
+    }
+    for (int i=0;i<m_resources;i++){
+        available[i] = available[i] - request[i];
+        allocation[process_num][i] = allocation[process_num][i]+request[i];
+        need[process_num][i] = need[process_num][i] - request[i];
+    }
+    return 0;
 }
