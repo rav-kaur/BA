@@ -19,6 +19,9 @@ int *safeSeq;// array of size n_processes to store the safe sequence
 int n_processes = 0; 
 int m_resources = 0;
 
+pthread_mutex_t lockResources;
+pthread_cond_t condition;
+
 //Functions
 int resource_request(int process_num, int request[]);
 int resource_release(int process_num,int release[]);
@@ -237,7 +240,31 @@ void user_commands(){
             print_need();
 
         } else if (strcmp(command, "Run")==0){ 
-            
+            if (get_safeSeq()==-1){
+                printf("Unsafe Sequence\n");
+                exit(-1);
+            }
+            printf("\n Safe Sequence < ");
+            for (int i =0;i<n_processes;i++){
+                printf("%d ",safeSeq[i]);
+            }
+            printf(">");
+            end=1;
+            sleep(1);
+            pthread_t threads[n_processes];
+            int threadsNo[n_processes];
+            for(int t=0;t<n_processes;t++)
+            {
+                threadsNo[t] = t;
+            }
+            for(int i=0;i<n_processes;i++)
+            {
+                pthread_create(&threads[i],NULL,&thread_process,(void*)(&threadsNo[i]));
+            }
+            for(int i=0; i<n_processes; i++)
+            {
+                pthread_join(threads[i], NULL);
+            }
         } else if (strcmp(command, "Exit")==0){
             break;
         }
@@ -356,4 +383,62 @@ int get_safeSeq(){
         
     }
     return 0; // safe sequence found}
+}
+
+void* thread_process(void *arg) {
+
+        int p = *((int *) arg);
+
+	// lock resources
+        pthread_mutex_lock(&lockResources);
+
+        // condition check
+        while(p != safeSeq[processes_ran]){
+            pthread_cond_wait(&condition, &lockResources);
+        }
+                
+	// process
+        printf("\n--> Process %d", p);
+        printf("\n\tAllocated : ");
+        for(int i=0; i<m_resources; i++){
+            printf("%3d", allocation[p][i]);
+        }
+                
+
+        printf("\n\tNeeded    : ");
+        for(int i=0; i<m_resources; i++){
+            printf("%3d", need[p][i]);
+        }
+        
+        printf("\n\tAvailable : ");
+        for(int i=0; i<m_resources; i++){
+            printf("%3d", available[i]);
+        }
+    
+        printf("\n"); sleep(1);
+
+        printf("\tThread has started...");
+        printf("\n"); sleep(rand()%3 + 2); // process code
+        printf("\tThread has finished...");
+        printf("\n"); sleep(1);
+        printf("\tThread is Releasing Resources...");
+        printf("\n"); sleep(1);
+
+        for(int i=0; i<m_resources; i++){
+            available[i] += allocation[p][i];
+        }
+
+        printf("\n\tNow Available : ");
+        for(int i=0; i<m_resources; i++){
+            printf("%3d", available[i]);
+        }
+        printf("\n\n");
+
+        sleep(1);
+
+	// condition broadcast
+        processes_ran++;
+        pthread_cond_broadcast(&condition);
+        pthread_mutex_unlock(&lockResources);
+	    pthread_exit(NULL);
 }
