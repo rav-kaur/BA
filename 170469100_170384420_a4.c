@@ -21,6 +21,9 @@ int m_resources = 0;
 
 //Functions
 void get_resource_process_value(FILE* file); // Function to get the number of processes and resources from the test file
+void read_file(FILE* file);
+
+
 int main(int argc, char** argv) {
 
     char *fileName = argv[1];
@@ -33,6 +36,9 @@ int main(int argc, char** argv) {
 
 	// Retrieving the value for processes and resources dynamically
     get_resource_process_value(file);
+
+	// reads the contents of the file
+	read_file(file);
 
 }
 
@@ -55,4 +61,28 @@ void get_resource_process_value(FILE* file){
         n_processes++;
     }
     
+}
+
+void read_file(FILE* file){
+    char line[100]; // each line from the sample file
+    char *each_line=NULL; // to store each line
+    char *line_token=NULL; // to store elements of each line
+    int process = 0; // counter for number of processes
+    int resource = 0; // counter for number of resource in each process
+    while( fgets(line,sizeof(line),file)){
+        each_line = strtok(line, "\r\n" ); // splitting the line by  new character
+        resource=0;
+        line_token = strtok(each_line, "," ); // splitting the contents of each line by comma
+        
+        while (line_token!=NULL){
+            // initialize maximum
+            maximum[process][resource] = atoi(line_token);  // converting the content char to integer to store in the maximum integer array
+            line_token = strtok(NULL, "," );
+            resource++;
+            
+        }
+        each_line = strtok(NULL, "\r\n" );
+        process++;
+    }
+
 }
