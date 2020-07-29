@@ -76,6 +76,18 @@ int main(int argc, char** argv) {
 	// reads the contents of the file
 	read_file(file);
 
+	// initializing need matrix
+    for (int p=0;p<n_processes;p++){
+        for (int r=0;r<m_resources;r++){
+            need[p][r] = maximum[p][r]-allocation[p][r];
+        }
+    }
+
+	printf("Maximum resources from file: \n");
+	// Function for all possible user commands:
+    // Exit == end program
+    user_commands();
+
 }
 
 void get_resource_process_value(FILE* file){
@@ -121,4 +133,36 @@ void read_file(FILE* file){
         process++;
     }
 
+}
+
+int resource_release(int process_num,int release[])
+{
+    // Update the arrays
+    for(int i=0;i<m_resources;i++){
+        //releasing resources means adding them back to available array
+        available[i]+=release[i];
+        //subtracting from allocated arrays since it will be loosing resources
+        allocation[process_num][i]-=release[i];
+        //adding to the need array since we will be needing more resources now
+        need[process_num][i]+=release[i];
+        if (available[i]>need[process_num][i]){
+            available[i]-=need[process_num][i]+maximum[process_num][i];
+            need[process_num][i] =0;
+        }
+
+        // if allocation doesnt have enough resources to release then it will deny the request
+        if (allocation[process_num][i]<0){
+            return -1;
+
+            // go back to previous stage of array values since the request is denied now
+
+            for(int x=0;x<i;x++){
+                available[i] -= release[i];
+                allocation[process_num][i] += release[i];
+                need[process_num][i] -= release[i];
+            }
+            return 0;
+
+        }
+    }
 }
