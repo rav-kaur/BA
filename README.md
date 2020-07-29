@@ -1,8 +1,9 @@
 # Project Title: Banker's Algorithm
-Motivation: Assignment
 
-### Compile Manually
+### Motivation
+Assignment
 
+### Installation
 ```bash
 # compile
 gcc -Werror -Wall -g -std=gnu99 -o 170469100_170384420_a04 *.c -lrt -lpthread
@@ -12,7 +13,7 @@ gcc -Werror -Wall -g -std=gnu99 -o 170469100_170384420_a04 *.c -lrt -lpthread
 ```
 ### Screenshots
 
-### Individual Controbution
+### Individual Contribution
 
 #### Marvi Shaikh
 ```
