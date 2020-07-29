@@ -37,6 +37,42 @@ int main(int argc, char** argv) {
 	// Retrieving the value for processes and resources dynamically
     get_resource_process_value(file);
 
+	//Dynamically Allocate the Need, Allocation, Available, Safe Sequence arrays
+    available = (int *)malloc(m_resources * sizeof(*available));
+    safeSeq = (int *)malloc(n_processes * sizeof(*safeSeq));
+
+
+    // Allocating the availabel values to the available aarray 
+    int j = 2;
+    for (int i=0;i<m_resources;i++){
+        available[i] = atoi(argv[j]);
+        j++;
+    }
+
+    allocation = (int **)malloc(n_processes * sizeof(*allocation));
+    for(int i=0; i<n_processes; i++){
+        allocation[i] = (int *)malloc(m_resources * sizeof(**allocation));
+    }
+    
+    // Initializing the allocation array to 0s
+    for (int i=0;i<n_processes;i++){
+        for (int j=0;j<m_resources;j++){
+            allocation[i][j] = 0;
+        }
+    }
+
+    maximum = (int **)malloc(n_processes * sizeof(*maximum));
+    for(int i=0; i<n_processes; i++){
+        maximum[i] = (int *)malloc(m_resources * sizeof(**maximum));
+    }
+
+   need = (int **)malloc(n_processes * sizeof(*need));
+    for(int i=0; i<n_processes; i++){
+        need[i] = (int *)malloc(m_resources * sizeof(**need));
+    }
+    
+    // Moving the cursor back to the starting of the file
+    fseek(file,0,SEEK_SET);
 	// reads the contents of the file
 	read_file(file);
 
