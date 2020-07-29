@@ -1,3 +1,18 @@
+/*
+CP386 Assignment 4
+Partner 1 - Ravneet Kaur
+ID # - 170469100
+Github ID - rav-kaur
+
+Partner 2 - Marvi Shaikh
+ID # - 170384420
+Date - July 29, 2020
+Github ID - marvi99
+
+Github URL - 
+
+*/
+
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
