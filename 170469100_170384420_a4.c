@@ -135,6 +135,41 @@ void read_file(FILE* file){
 
 }
 
+void print_available(){
+    for (int i = 0; i<m_resources; i++){
+        printf("%d ", available[i]);
+    }
+    printf("\n");
+}
+
+void print_maximum(){
+    for (int i = 0; i< n_processes; i++){
+        for (int j = 0; j < m_resources; j++){
+            printf("%d ", maximum[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+void print_allocation(){
+    for (int i = 0; i< n_processes; i++){
+        for (int j = 0; j < m_resources; j++){
+            printf("%d ", allocation[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+void print_need(){
+    for (int i = 0; i< n_processes; i++){
+        for (int j = 0; j < m_resources; j++){
+            printf("%d ", need[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+
 int resource_release(int process_num,int release[])
 {
     // Update the arrays
