@@ -35,6 +35,7 @@ void print_allocation();
 void print_need();
 
 int get_safeSeq();
+void* thread_process(void* );
 
 
 int main(int argc, char** argv) {
