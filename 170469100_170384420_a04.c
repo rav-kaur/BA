@@ -34,7 +34,7 @@ int *safeSeq;// array of size n_processes to store the safe sequence
 int n_processes = 0; 
 int m_resources = 0;
 
-pthread_mutex_t lockResources;
+pthread_mutex_t lockResources; // mutex lock
 pthread_cond_t condition;
 
 //Functions
@@ -277,19 +277,20 @@ void user_commands(){
             }
             for(int i=0;i<n_processes;i++)
             {
+                // Creating threads for each process and running the thread_process functiin
                 pthread_create(&threads[i],NULL,&thread_process,(void*)(&threadsNo[i]));
             }
             for(int i=0; i<n_processes; i++)
             {
+                // Joining threads to run in sequence
                 pthread_join(threads[i], NULL);
             }
+            // If user enters "Exit" command , the function terminates
         } else if (strcmp(command, "Exit")==0){
             break;
         }
     }
 }
-
-
 
 int resource_release(int process_num,int release[])
 {
@@ -334,36 +335,36 @@ int resource_request(int process_num, int request[]){
         if (request[x]>need[process_num][x])
         {            
             safe_state=FALSE; // you can't request/allocate resources more than its needed and hence it enters unsafe sequence
-            return -1;
+            return -1; //  Request Denies
         }   
         else continue;
     }
     for (int x=0;x<m_resources;x++)
     {
-        if (request[x]>available[x])
+        if (request[x]>available[x]) //  if request exceeds the number of available resources, the process enters wait state where it waits until available resources increases
         {
-            wait_state = TRUE;
+            wait_state = TRUE; // Process enters wait state
             break;
         }
         else continue;
 
     }
     if (wait_state==TRUE){
-        return -1;
+        return -1; // Request Denied
     }
     for (int i=0;i<m_resources;i++){
-        available[i] = available[i] - request[i];
-        allocation[process_num][i] = allocation[process_num][i]+request[i];
-        need[process_num][i] = need[process_num][i] - request[i];
+        available[i] = available[i] - request[i]; //  decrease available resources
+        allocation[process_num][i] = allocation[process_num][i]+request[i]; // increase allocation
+        need[process_num][i] = need[process_num][i] - request[i]; // decrease need
     }
     return 0;
 }
 
 int get_safeSeq(){
     // get safe sequence
-    int tempRes[m_resources];
+    int temp_resources[m_resources];
     for(int i=0; i<m_resources; i++) {
-        tempRes[i] = available[i];
+        temp_resources[i] = available[i];
     }
     int finished[n_processes];
     for(int i=0; i<n_processes; i++) finished[i] = FALSE;
@@ -377,7 +378,7 @@ int get_safeSeq(){
                 int possible = TRUE;
                 for(int j=0; j<m_resources; j++)
                 {
-                    if(need[i][j] > tempRes[j])
+                    if(need[i][j] > temp_resources[j])
                     {
                         possible = FALSE;
                         break;
@@ -386,7 +387,7 @@ int get_safeSeq(){
                 if(possible) 
                 {
                     for(int j=0; j<m_resources; j++){
-                        tempRes[j] += allocation[i][j];
+                        temp_resources[j] += allocation[i][j];
                     }
                     safeSeq[process_finished] = i;
                     finished[i] = TRUE;
@@ -436,12 +437,16 @@ void* thread_process(void *arg) {
         printf("\n"); sleep(1);
 
         printf("\tThread has started...");
-        printf("\n"); sleep(rand()%3 + 2); // process code
+        printf("\n"); 
+        sleep(2); // process code
         printf("\tThread has finished...");
-        printf("\n"); sleep(1);
+        printf("\n"); 
+        sleep(1);
         printf("\tThread is Releasing Resources...");
-        printf("\n"); sleep(1);
+        printf("\n"); 
+        sleep(1);
 
+        // updating the available array 
         for(int i=0; i<m_resources; i++){
             available[i] += allocation[p][i];
         }
@@ -451,12 +456,11 @@ void* thread_process(void *arg) {
             printf("%3d", available[i]);
         }
         printf("\n\n");
-
         sleep(1);
 
 	// condition broadcast
         processes_ran++;
         pthread_cond_broadcast(&condition);
-        pthread_mutex_unlock(&lockResources);
+        pthread_mutex_unlock(&lockResources); // unlocking threads
 	    pthread_exit(NULL);
 }
