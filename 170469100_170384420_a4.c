@@ -20,14 +20,16 @@ int n_processes = 0;
 int m_resources = 0;
 
 //Functions
-void get_resource_process_value(FILE* file); // Function to get the number of processes and resources from the test file
+int resource_request(int process_num, int request[]);
+int resource_release(int process_num,int release[]);
 void read_file(FILE* file);
+void get_resource_process_value(FILE* file);
+void user_commands();
+
 void print_available();
 void print_maximum();
 void print_allocation();
 void print_need();
-int resource_request(int process_num, int request[]);
-int resource_release(int process_num,int release[]);
 
 
 int main(int argc, char** argv) {
@@ -174,6 +176,72 @@ void print_need(){
         printf("\n");
     }
 }
+
+void user_commands(){
+    int counter = 0;
+    int end = 0;
+    while (end!=1) {
+        printf("Enter Command ('Exit' to end): ");
+        char str[20]; 
+        scanf("%[^\n]%*c", str);
+        
+        char *ptr = strtok(str, " ");
+        int count = 0;
+        char command[5];
+        int process_num;
+        int temp_resources[m_resources];
+        int i = 0;
+        while(ptr != NULL)
+        {
+            if (count == 0){
+                strcpy(command, ptr);
+            } else if (count == 1){
+                process_num = atoi(ptr);
+            } else {
+                temp_resources[i] = atoi(ptr);
+                i++;
+            }
+            ptr = strtok(NULL, " ");
+            count++;
+        }
+
+        if (strcmp(command, "RQ") == 0){
+            if (resource_request(process_num, temp_resources) == 0){
+                printf("Request is satisfied. \n\n");
+                continue;
+            } else{
+                printf("Request is not satisfied. \n\n");
+                continue;
+            }
+            
+        } else if (strcmp(command, "RL") == 0){
+            int i = resource_release(process_num, temp_resources);
+            if (i==0){
+                printf("Release Request is satisfied. \n Resources have been released\n");
+            } else{
+                printf("Release Request is denied. No enough allocated resources\n");
+            }
+
+        }else if (strcmp(command, "*") == 0){
+           
+            printf("\n* Current state of Available, Maximum, Allocation, Need arrays\n");
+            printf("Available: \n");
+            print_available();
+            printf("Maximum: \n");
+            print_maximum();
+            printf("Allocation: \n");
+            print_allocation();
+            printf("Need: \n");
+            print_need();
+
+        } else if (strcmp(command, "Run")==0){ 
+            
+        } else if (strcmp(command, "Exit")==0){
+            break;
+        }
+    }
+}
+
 
 
 int resource_release(int process_num,int release[])
