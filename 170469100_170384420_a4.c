@@ -16,6 +16,11 @@ int **maximum;// pointer of size n_processes*m_resources that defines the maximu
 int **need; // pointer of size n_processes*m_resources that defines the remaining need of resources for each process
 int *safeSeq;// array of size n_processes to store the safe sequence
 
+int n_processes = 0; 
+int m_resources = 0;
+
+//Functions
+void get_resource_process_value(FILE* file); // Function to get the number of processes and resources from the test file
 int main(int argc, char** argv) {
 
     char *fileName = argv[1];
@@ -26,4 +31,28 @@ int main(int argc, char** argv) {
 		return -1;
 	}
 
+	// Retrieving the value for processes and resources dynamically
+    get_resource_process_value(file);
+
+}
+
+void get_resource_process_value(FILE* file){
+
+    char line[100]; // each line from the sample file
+    char *each_line=NULL; // to store each line
+    char *line_token=NULL; // to store elements of each line
+
+    while( fgets(line,sizeof(line),file)){
+        each_line = strtok(line, "\r\n" ); // splitting the line by  new character
+        m_resources=0;
+        line_token = strtok(each_line, "," ); // splitting the contents of each line by comma
+        
+        while (line_token!=NULL){ 
+            line_token = strtok(NULL, "," );
+            m_resources++;
+        }
+        each_line = strtok(NULL, "\r\n" );
+        n_processes++;
+    }
+    
 }
