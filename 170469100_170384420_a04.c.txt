@@ -53,70 +53,78 @@ void* thread_process(void* );
 
 
 int main(int argc, char** argv) {
-
-    char *fileName = argv[1];
-    FILE* file = fopen(fileName, "r");
-    if(!file)
-	{
-		printf("Error in opening input file...exiting with error code -1\n");
-		return -1;
-	}
-
-	// Retrieving the value for processes and resources dynamically
-    get_resource_process_value(file);
-
-	//Dynamically Allocate the Need, Allocation, Available, Safe Sequence arrays
-    available = (int *)malloc(m_resources * sizeof(*available));
-    safeSeq = (int *)malloc(n_processes * sizeof(*safeSeq));
-
-
-    // Allocating the availabel values to the available aarray 
-    int j = 2;
-    for (int i=0;i<m_resources;i++){
-        available[i] = atoi(argv[j]);
-        j++;
-    }
-
-    allocation = (int **)malloc(n_processes * sizeof(*allocation));
-    for(int i=0; i<n_processes; i++){
-        allocation[i] = (int *)malloc(m_resources * sizeof(**allocation));
-    }
     
-    // Initializing the allocation array to 0s
-    for (int i=0;i<n_processes;i++){
-        for (int j=0;j<m_resources;j++){
-            allocation[i][j] = 0;
+    int commands_given = 0;
+    for (int i = 0; i < argc; ++i){
+        commands_given++;
+    }
+    if (commands_given!=6){
+        printf("\nError, Missing arguments, Run again with proper format :\nRequired:  .c sample4_in.txt available resources\n\n");
+    } else{
+        char *fileName = argv[1];
+        FILE* file = fopen(fileName, "r");
+        if(!file)
+        {
+            printf("Error in opening input file...exiting with error code -1\n");
+            return -1;
         }
-    }
 
-    maximum = (int **)malloc(n_processes * sizeof(*maximum));
-    for(int i=0; i<n_processes; i++){
-        maximum[i] = (int *)malloc(m_resources * sizeof(**maximum));
-    }
+        // Retrieving the value for processes and resources dynamically
+        get_resource_process_value(file);
 
-   need = (int **)malloc(n_processes * sizeof(*need));
-    for(int i=0; i<n_processes; i++){
-        need[i] = (int *)malloc(m_resources * sizeof(**need));
-    }
-    
-    // Moving the cursor back to the starting of the file
-    fseek(file,0,SEEK_SET);
-	// reads the contents of the file
-	read_file(file);
+        //Dynamically Allocate the Need, Allocation, Available, Safe Sequence arrays
+        available = (int *)malloc(m_resources * sizeof(*available));
+        safeSeq = (int *)malloc(n_processes * sizeof(*safeSeq));
 
-	// initializing need matrix
-    for (int p=0;p<n_processes;p++){
-        for (int r=0;r<m_resources;r++){
-            need[p][r] = maximum[p][r]-allocation[p][r];
+
+        // Allocating the availabel values to the available aarray 
+        int j = 2;
+        for (int i=0;i<m_resources;i++){
+            available[i] = atoi(argv[j]);
+            j++;
         }
-    }
 
-	printf("Maximum resources from file: \n");
-	print_maximum();
-	
-	// Function for all possible user commands:
-    // Exit == end program
-    user_commands();
+        allocation = (int **)malloc(n_processes * sizeof(*allocation));
+        for(int i=0; i<n_processes; i++){
+            allocation[i] = (int *)malloc(m_resources * sizeof(**allocation));
+        }
+        
+        // Initializing the allocation array to 0s
+        for (int i=0;i<n_processes;i++){
+            for (int j=0;j<m_resources;j++){
+                allocation[i][j] = 0;
+            }
+        }
+
+        maximum = (int **)malloc(n_processes * sizeof(*maximum));
+        for(int i=0; i<n_processes; i++){
+            maximum[i] = (int *)malloc(m_resources * sizeof(**maximum));
+        }
+
+    need = (int **)malloc(n_processes * sizeof(*need));
+        for(int i=0; i<n_processes; i++){
+            need[i] = (int *)malloc(m_resources * sizeof(**need));
+        }
+        
+        // Moving the cursor back to the starting of the file
+        fseek(file,0,SEEK_SET);
+        // reads the contents of the file
+        read_file(file);
+
+        // initializing need matrix
+        for (int p=0;p<n_processes;p++){
+            for (int r=0;r<m_resources;r++){
+                need[p][r] = maximum[p][r]-allocation[p][r];
+            }
+        }
+
+        printf("Maximum resources from file: \n");
+        print_maximum();
+        
+        // Function for all possible user commands:
+        // Exit == end program
+        user_commands();
+    }
 
 }
 
