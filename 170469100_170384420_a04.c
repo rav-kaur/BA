@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
         commands_given++;
     }
     if (commands_given!=6){
-        printf("\nError: Missing arguments: \n Required: .c sample4_in.txt available resources\n\n");
+        printf("\nError, Missing arguments, Run again with proper format :\nRequired:  .c sample4_in.txt available resources\n\n");
     } else{
         char *fileName = argv[1];
         FILE* file = fopen(fileName, "r");
